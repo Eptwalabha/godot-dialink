@@ -7,20 +7,67 @@ export(Array, String, FILE) var dialog_files := [] setget _load_new_dialog_file
 var file_valid = false
 var variables := {}
 var dialogs := {}
-var visited := []
+var visited := {}
+var current_dialog : String = ''
+var current_index : int = 0
 
-func start_dialog(key: String) -> void:
-	pass
+func start(key: String) -> void:
+	if not dialogs.has(key):
+		return
+	if not visited.has(key):
+		visited[key] = 0
+	visited[key] += 1
+	current_dialog = key
+	current_index = 0
 
 func next() -> Dictionary:
-	return {}
+	if current_dialog == '' or not dialogs.has(current_dialog):
+		return {}
+	var dialog = dialogs[current_dialog]
+	if current_index >= len(dialog):
+		return {}
+	var node = dialog[current_index]
+	if node.has('if') and _if(node.get('if')):
+		current_index += 1
+		return next()
+	
+	current_index += 1
+	if node.has('op'):
+		_op(node.get('op'))
+		return next()
+	else:
+		return _build_node(node)
+		
+
+func _build_node(node) -> Dictionary:
+	var next = {}
+	if not node.has('text'):
+		return next
+	next.text = node.text[0]
+	if node.has('choices'):
+		var choices = []
+		var id = 0
+		for choice in node['choices']:
+			id += 1
+			if choice.has('if') and not _if(choice['if']):
+				continue
+			choices.append({
+				'text': choice.text[0],
+				'id': id - 1,
+			})
+		if len(choices) > 0:
+			next['choices'] = choices
+			return next
+		else:
+			return {}
+	return next
 
 func choice_next(index: int) -> Dictionary:
 	return {}
 
-func dialogs_list() -> Array:
+func dialog_list() -> Array:
 	return dialogs.keys()
-	
+
 func variables() -> Dictionary:
 	return variables
 
@@ -57,7 +104,7 @@ func _load_new_dialog_file(files: Array) -> void:
 func _reset_node() -> void:
 	variables = {}
 	dialogs = {}
-	visited = []
+	visited = {}
 
 func _merge_dialogs(json: Dictionary) -> bool:
 	var json_dialogs = json.get("dialogs")
@@ -70,7 +117,6 @@ func _merge_dialogs(json: Dictionary) -> bool:
 	for variable in json_variables:
 		if not variables.has(variable):
 			variables[variable] = json_variables[variable]
-	print(dialogs_list())
 	return true
 
 func _op(opperation) -> void:
@@ -85,7 +131,7 @@ func _op(opperation) -> void:
 func _if(predicate) -> bool:
 	match predicate:
 		['visited', var dialog_key]:
-			return visited.has(dialog_key)
+			return visited.has(dialog_key) and visited[dialog_key] > 0
 		['not_visited', var dialog_key]:
-			return not visited.has(dialog_key)
+			return not visited.has(dialog_key) or visited[dialog_key] == 0
 	return false

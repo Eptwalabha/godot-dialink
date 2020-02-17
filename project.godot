@@ -27,6 +27,7 @@ _global_script_class_icons={
 [application]
 
 config/name="dialink"
+run/main_scene="res://Simple.tscn"
 config/icon="res://icon.png"
 
 [editor_plugins]
