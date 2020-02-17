@@ -1,0 +1,88 @@
+{
+    "variables": {
+        "variable_one": 1,
+        "variable_two": "super"
+    },
+    "dialogs": {
+        "dialog_key_one": [
+            {
+                "if": ["not_visited", "dialog_key_one.part_two"],
+                "text": ["Hello, how are you?"]
+            },
+            {
+                "text": ["My name is John."]
+            },
+            {
+                "op": ["+", "variable_one", 1]
+            },
+            {
+                "text": ["do you know why you wake up here?"],
+                "choices": [
+                    {
+                        "text": [
+                            "no ",
+                            {
+                                "if": ["gt", "$variable_one", 2],
+                                "text": ["( $variable_one )"]
+                            },
+                            "and frankly… I don't care"
+                        ],
+                        "then": ">part_two",
+                        "f": 1
+                    },
+                    {
+                        "text": ["who are you again?"],
+                        "then": ">dialog_key_one"
+                    },
+                    {
+                        "if": ["visited", "ending"],
+                        "text": ["yes, I also know who you are dipshit"],
+                        "then": ">dialog_key_two"
+                    },
+                    {
+                        "text": ["choice 4"],
+                        "then": [
+                            {
+                                "text": ["other question: are you ok?"],
+                                "choices": [
+                                    {
+                                        "text": "1. yes",
+                                        "then": ">yes"
+                                    },
+                                    {
+                                        "text": "2. no",
+                                        "then": ">no"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "text": ["quit"]
+                    }
+                ]
+            }
+        ],
+        "dialog_key_one.part_two": [
+            {
+                "text": ["welome to part two"]
+            },
+            {
+                "text": ["but we need to go back to part one"],
+                "then": ">dialog_key_one"
+            }
+        ],
+        "dialog_key_one.no": [
+            {
+                "text": ["you answered no"]
+            }
+        ],
+        "dialog_key_one.yes": [
+            {
+                "text": ["you answered yes"]
+            }
+        ],
+        "dialog_key_two": [
+        ]
+    }
+}

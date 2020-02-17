@@ -1,0 +1,178 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://addons/dialink/DialogSystem.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Simple.gd" type="Script" id=4]
+
+[sub_resource type="Theme" id=1]
+
+[sub_resource type="Theme" id=2]
+
+[sub_resource type="Gradient" id=3]
+offsets = PoolRealArray( 0, 0.11194, 0.325926, 0.607407, 0.8, 1 )
+colors = PoolColorArray( 1, 1, 1, 1, 0.925781, 0.876961, 0.144653, 1, 0.864746, 0.0236454, 0.0236454, 1, 0, 0, 0, 0.866667, 0, 0, 0, 0.678431, 0.00392157, 0, 0, 0 )
+
+[sub_resource type="GradientTexture" id=4]
+gradient = SubResource( 3 )
+
+[sub_resource type="Curve" id=5]
+_data = [ Vector2( 0, 0 ), 0.0, 3.17893, 0, 0, Vector2( 0.452229, 0.445455 ), -2.94375, -2.94375, 0, 0, Vector2( 1, 1 ), 0.0, 0.0, 0, 0 ]
+
+[sub_resource type="CurveTexture" id=6]
+curve = SubResource( 5 )
+
+[sub_resource type="ParticlesMaterial" id=7]
+emission_shape = 2
+emission_box_extents = Vector3( 30, 30, 30 )
+flag_disable_z = true
+direction = Vector3( 0, 0, 0 )
+spread = 180.0
+initial_velocity = 100.0
+angular_velocity = -133.95
+angular_velocity_random = 1.0
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+tangential_accel = 86.05
+angle_random = 1.0
+scale = 47.51
+scale_curve = SubResource( 6 )
+color_ramp = SubResource( 4 )
+
+[node name="Simple" type="Node"]
+script = ExtResource( 4 )
+
+[node name="UI" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Menu" type="HBoxContainer" parent="UI"]
+anchor_left = 0.0831093
+anchor_top = 0.435862
+anchor_right = 0.391078
+anchor_bottom = 0.502609
+margin_right = -0.359924
+margin_bottom = -0.0480042
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="DialogSelection" type="OptionButton" parent="UI/Menu"]
+margin_right = 281.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+theme = SubResource( 1 )
+
+[node name="Go" type="Button" parent="UI/Menu"]
+margin_left = 285.0
+margin_right = 315.0
+margin_bottom = 40.0
+text = "Go"
+flat = true
+
+[node name="Events" type="RichTextLabel" parent="UI"]
+anchor_left = 0.42
+anchor_top = 0.058
+anchor_right = 0.93
+anchor_bottom = 0.485
+margin_left = -0.0800171
+margin_top = 0.199997
+margin_right = -0.320068
+theme = SubResource( 2 )
+bbcode_enabled = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Dialog" type="Control" parent="UI"]
+anchor_left = 0.08
+anchor_top = 0.537
+anchor_right = 0.931
+anchor_bottom = 0.884
+margin_left = -0.297569
+margin_top = -0.00274658
+margin_right = 0.278381
+margin_bottom = -0.202759
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Background" type="ColorRect" parent="UI/Dialog"]
+anchor_right = 1.0
+anchor_bottom = 1.187
+margin_right = 6.10352e-05
+margin_bottom = 0.103989
+color = Color( 0, 0, 0, 0.380392 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Title" type="Label" parent="UI/Dialog"]
+anchor_left = 0.998
+anchor_right = 0.998
+margin_left = -66.3254
+margin_top = 12.7559
+margin_right = -14.3254
+margin_bottom = 26.7559
+size_flags_horizontal = 3
+text = "DIALOG"
+align = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Content" type="VBoxContainer" parent="UI/Dialog"]
+anchor_left = 0.026
+anchor_top = 0.163
+anchor_right = 0.972
+anchor_bottom = 0.889
+margin_left = 0.328001
+margin_top = 0.0960007
+margin_right = 0.416016
+margin_bottom = 0.0879822
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="DialogText" type="RichTextLabel" parent="UI/Dialog/Content"]
+margin_right = 824.0
+margin_bottom = 73.0
+size_flags_vertical = 3
+bbcode_enabled = true
+
+[node name="Choices" type="VBoxContainer" parent="UI/Dialog/Content"]
+margin_top = 77.0
+margin_right = 824.0
+margin_bottom = 150.0
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Next" type="Button" parent="UI/Dialog"]
+anchor_left = 0.978
+anchor_top = 1.09
+anchor_right = 0.978
+anchor_bottom = 1.09
+margin_left = -59.1522
+margin_top = -31.0362
+margin_right = -0.1521
+margin_bottom = -0.0362396
+text = "next"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Particles2D" type="Particles2D" parent="."]
+position = Vector2( 245.496, 132.879 )
+emitting = false
+amount = 32
+lifetime = 0.3
+one_shot = true
+process_material = SubResource( 7 )
+
+[node name="Node" parent="." instance=ExtResource( 1 )]
+dialog_files = [ "res://example.json" ]
+[connection signal="pressed" from="UI/Menu/Go" to="." method="_on_Button_pressed"]
+[connection signal="pressed" from="UI/Dialog/Next" to="." method="_on_NextDialog_pressed"]
