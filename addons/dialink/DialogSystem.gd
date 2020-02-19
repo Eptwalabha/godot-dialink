@@ -27,7 +27,7 @@ func start(key: String) -> void:
 func next() -> Dictionary:
 	var node = _current_node()
 	_move_forward()
-	if node.has('if') and _if(node.get('if')):
+	if node.has('if') and not _if(node['if']):
 		return next()
 
 	if node.has('op'):
@@ -220,6 +220,8 @@ func _if(predicate, path = []) -> bool:
 				match op:
 					'eq':
 						return variables[variable] == value
+					'ne':
+						return variables[variable] != value
 					'lt':
 						return variables[variable] < value
 					'le':

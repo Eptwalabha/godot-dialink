@@ -23,12 +23,29 @@
                             "no ",
                             {
                                 "if": ["test", "variable_one", "gt", 2],
-                                "text": ["( $variable_one )"]
+                                "text": ["( $variable_one ) "]
                             },
                             "and frankly… I don't care"
                         ],
                         "then": "part_two",
                         "f": 1
+                    },
+                    {
+                        "if": ["test", "variable_two", "eq", "super"],
+                        "text": ["test String comparaison"],
+                        "then": [
+                            {
+                                "text": ["text A"]
+                            },
+                            {
+                                "if": ["test", "variable_two", "eq", "nope"],
+                                "text": ["this text should never show up"]
+                            },
+                            {
+                                "text": ["text C (back to start)"],
+                                "then": "dialog_key_one"
+                            }
+                        ]
                     },
                     {
                         "if": ["test", "variable_one", "gt", 3],
@@ -87,6 +104,11 @@
             }
         ],
         "dialog_key_two": [
+            {
+                "text": ["test: one_two #super"]
+            }
+        ],
+        "ending": [
         ]
     }
 }
