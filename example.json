@@ -27,31 +27,35 @@
                             },
                             "and frankly… I don't care"
                         ],
-                        "then": ">part_two",
+                        "then": "part_two",
                         "f": 1
                     },
                     {
+                        "if": ["test", "variable_one", "gt", 3],
                         "text": ["who are you again?"],
-                        "then": ">dialog_key_one"
+                        "then": "dialog_key_one"
                     },
                     {
                         "if": ["visited", "ending"],
                         "text": ["yes, I also know who you are dipshit"],
-                        "then": ">dialog_key_two"
+                        "then": "dialog_key_two"
                     },
                     {
                         "text": ["choice 4"],
                         "then": [
                             {
+                                "text": ["super"]
+                            },
+                            {
                                 "text": ["other question: are you ok?"],
                                 "choices": [
                                     {
                                         "text": "1. yes",
-                                        "then": ">yes"
+                                        "then": "yes"
                                     },
                                     {
                                         "text": "2. no",
-                                        "then": ">no"
+                                        "then": "no"
                                     }
                                 ]
                             }
@@ -69,7 +73,7 @@
             },
             {
                 "text": ["but we need to go back to part one"],
-                "then": ">dialog_key_one"
+                "then": "dialog_key_one"
             }
         ],
         "dialog_key_one.no": [

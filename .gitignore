@@ -1,5 +1,6 @@
 .DS_Store
 *~
+.*.swp
 .import/
 logs/
 *.translation

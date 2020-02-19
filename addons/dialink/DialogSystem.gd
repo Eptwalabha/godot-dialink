@@ -8,8 +8,11 @@ var file_valid = false
 var variables := {}
 var dialogs := {}
 var visited := {}
+
 var current_dialog : String = ''
-var current_index : int = 0
+var parent_dialog : String = ''
+var current_path : Array = []
+var last_node
 
 func start(key: String) -> void:
 	if not dialogs.has(key):
@@ -18,26 +21,94 @@ func start(key: String) -> void:
 		visited[key] = 0
 	visited[key] += 1
 	current_dialog = key
-	current_index = 0
+	parent_dialog = key
+	current_path = [0]
 
 func next() -> Dictionary:
-	if current_dialog == '' or not dialogs.has(current_dialog):
-		return {}
-	var dialog = dialogs[current_dialog]
-	if current_index >= len(dialog):
-		return {}
-	var node = dialog[current_index]
+	var node = _current_node()
+	_move_forward()
 	if node.has('if') and _if(node.get('if')):
-		current_index += 1
 		return next()
-	
-	current_index += 1
+
 	if node.has('op'):
 		_op(node.get('op'))
 		return next()
 	else:
 		return _build_node(node)
+
+func choice_next(index: int) -> Dictionary:
+	var node = _current_node()
+	if index >= len(node['choices']):
+		_clear_cursor()
+		return {}
+	current_path.push_back(index)
+	var choice_path = current_path.duplicate()
+	if not visited.has(choice_path):
+		visited[choice_path] = 0
+	visited[choice_path] += 1
+
+	node = _current_node()
+	if not node.has('then'):
+		return {}
+	var then = node['then']
+	if then is String:
+		jump_to(then)
+	else:
+		current_path.push_back(0)
+	print(visited)
+	return next()
+
+func _move_forward() -> void:
+	var node = _current_node()
+	if node.has('then'):
+		var then = node['then']
+		if then is String:
+			jump_to(then)
+		if then is Array:
+			current_path.push_back(0)
+	elif node.has('choices'):
+		pass
+	else:
+		var first = current_path.pop_back()
+		current_path.push_back(first + 1)
+
+func _current_node() -> Dictionary:
+	if current_dialog == '' or !dialogs.has(current_dialog) or !len(current_path):
+		return {}
+	var current = dialogs[current_dialog]
+	for index in current_path:
+		var element = []
+		if current is Array:
+			element = current
+		elif current.has('choices'):
+			element = current['choices']
+		elif current.has('then') and current['then'] is Array:
+			element = current['then']
 		
+		if element is Array and index < len(element):
+			current = element[index]
+		else:
+			return {}
+	return current
+
+func jump_to(sub_dialog_name) -> void:
+	if sub_dialog_name is String:
+		var inner_jump = "%s.%s" % [parent_dialog, sub_dialog_name]
+		if dialogs.has(inner_jump):
+			current_dialog = inner_jump
+			current_path = [0]
+		elif dialogs.has(sub_dialog_name):
+			parent_dialog = sub_dialog_name
+			current_dialog = sub_dialog_name
+			current_path = [0]
+		else:
+			_clear_cursor()
+			printerr("wtf is '%s'?" % sub_dialog_name)
+
+func _clear_cursor() -> void:
+	parent_dialog = ''
+	current_dialog = ''
+	current_path = []
 
 func _build_node(node) -> Dictionary:
 	var next = {}
@@ -49,7 +120,9 @@ func _build_node(node) -> Dictionary:
 		var id = 0
 		for choice in node['choices']:
 			id += 1
-			if choice.has('if') and not _if(choice['if']):
+			var choice_path = current_path.duplicate()
+			choice_path.push_back(id - 1)
+			if choice.has('if') and not _if(choice['if'], choice_path):
 				continue
 			choices.append({
 				'text': choice.text[0],
@@ -61,9 +134,6 @@ func _build_node(node) -> Dictionary:
 		else:
 			return {}
 	return next
-
-func choice_next(index: int) -> Dictionary:
-	return {}
 
 func dialog_list() -> Array:
 	return dialogs.keys()
@@ -128,8 +198,26 @@ func _op(opperation) -> void:
 		['*', var key, var value]:
 			variables[key] *= value
 
-func _if(predicate) -> bool:
+func _if(predicate, path = []) -> bool:
 	match predicate:
+		['test', var variable, var op, var value]:
+			if not variables.has(variable):
+				return false
+			else:
+				match op:
+					'eq':
+						return variables[variable] == value
+					'lt':
+						return variables[variable] < value
+					'le':
+						return variables[variable] <= value
+					'gt':
+						return variables[variable] > value
+					'ge':
+						return variables[variable] >= value
+			return false
+		['count_lower', var nth]:
+			return not visited.has(path) or visited[path] < nth
 		['visited', var dialog_key]:
 			return visited.has(dialog_key) and visited[dialog_key] > 0
 		['not_visited', var dialog_key]:
