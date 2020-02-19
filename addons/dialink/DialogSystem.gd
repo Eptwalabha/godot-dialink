@@ -39,31 +39,24 @@ func next() -> Dictionary:
 	return _do_next(node)
 
 func _do_next(node) -> Dictionary:
-	if _process_op(node):
-		return next()
-	elif _process_then(node):
-		if not node.has('text'):
-			return next()
-		else:
-			return _build_node(node)
-	else:
+	_process_op(node)
+	_process_then(node)
+	if node.has('text'):
 		return _build_node(node)
+	else:
+		return next()
 
-func _process_op(node) -> bool:
+func _process_op(node) -> void:
 	if node.has('op'):
 		_op(node.get('op'))
-		return true
-	return false
 
-func _process_then(node) -> bool:
+func _process_then(node) -> void:
 	if node.has('then'):
 		var then = node['then']
 		if then is String:
 			jump_to(then)
 		if then is Array:
 			current_path.push_back(0)
-		return true
-	return false
 
 func choice_next(index: int) -> Dictionary:
 	var node = _current_node()
@@ -258,10 +251,16 @@ func _op(opperation) -> void:
 		['=', var key, var value]:
 			variables[key] = value
 		['+', var key, var value]:
+			if not variables.has(key):
+				variables[key] = 0
 			variables[key] += value
 		['-', var key, var value]:
+			if not variables.has(key):
+				variables[key] = 0
 			variables[key] -= value
 		['*', var key, var value]:
+			if not variables.has(key):
+				variables[key] = 0
 			variables[key] *= value
 
 func _if(predicate, path = []) -> bool:
