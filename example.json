@@ -1,6 +1,6 @@
 {
     "variables": {
-        "bob_age": 20,
+        "bob_age": 19,
         "variable_two": "super",
         "character_two": "Alice",
         "character_two_introduced": false
@@ -12,10 +12,10 @@
                 "text": ["$character_two: Hello, how are you? # fake # lol"]
             },
             {
-                "text": ["bob: My name is bob, and I'm ($bob_age) years old. # super"]
+                "op": ["+", "bob_age", 1]
             },
             {
-                "op": ["+", "bob_age", 1]
+                "text": ["bob: My name is bob, and I'm ($bob_age) years old. # super"]
             },
             {
                 "text": ["bob: test: do you know why you wake up here? # tag1 #tag2 # !particle #!event"],
@@ -25,22 +25,20 @@
                             "No",
                             {
                                 "if": ["test", "bob_age", "gt", 25],
-                                "text": [" old man ( of $bob_age years old)"]
+                                "text": ["! You old man of $bob_age years old"]
                             },
                             ". And to be honest. I don't care."
                         ],
                         "then": [
                             {
-                                "text": ["bob: ok, I understand"]
+                                "text": ["bob: Ok, I understand"]
                             },
                             {
                                 "if": ["test", "character_two_introduced", "eq", false],
                                 "then": "part_two"
                             },
                             {
-                                "text": ["$character_two: How rude!"]
-                            },
-                            {
+                                "text": ["$character_two: How rude!"],
                                 "then": "dialog_key_one"
                             }
                         ],

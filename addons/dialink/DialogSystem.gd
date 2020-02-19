@@ -42,7 +42,10 @@ func _do_next(node) -> Dictionary:
 	if _process_op(node):
 		return next()
 	elif _process_then(node):
-		return next()
+		if not node.has('text'):
+			return next()
+		else:
+			return _build_node(node)
 	else:
 		return _build_node(node)
 
