@@ -2,6 +2,8 @@ tool
 class_name DialogSystem
 extends Node
 
+signal event_emitted(dialog, event_name)
+
 export(Array, String, FILE) var dialog_files := [] setget _load_new_dialog_file
 
 var file_valid = false
@@ -26,15 +28,39 @@ func start(key: String) -> void:
 
 func next() -> Dictionary:
 	var node = _current_node()
+	if node.has('if'):
+		if not _if(node['if']):
+			_move_next_sibling()
+			return next()
+		else:
+			_move_forward()
+			return _do_next(node)
 	_move_forward()
-	if node.has('if') and not _if(node['if']):
-		return next()
+	return _do_next(node)
 
-	if node.has('op'):
-		_op(node.get('op'))
+func _do_next(node) -> Dictionary:
+	if _process_op(node):
+		return next()
+	elif _process_then(node):
 		return next()
 	else:
 		return _build_node(node)
+
+func _process_op(node) -> bool:
+	if node.has('op'):
+		_op(node.get('op'))
+		return true
+	return false
+
+func _process_then(node) -> bool:
+	if node.has('then'):
+		var then = node['then']
+		if then is String:
+			jump_to(then)
+		if then is Array:
+			current_path.push_back(0)
+		return true
+	return false
 
 func choice_next(index: int) -> Dictionary:
 	var node = _current_node()
@@ -68,6 +94,9 @@ func _move_forward() -> void:
 	elif node.has('choices'):
 		pass
 	else:
+		_move_next_sibling()
+
+func _move_next_sibling() -> void:
 		var first = current_path.pop_back()
 		current_path.push_back(first + 1)
 
@@ -110,10 +139,9 @@ func _clear_cursor() -> void:
 	current_path = []
 
 func _build_node(node) -> Dictionary:
-	var next = {}
 	if not node.has('text'):
-		return next
-	next.text = _build_text(node.text)
+		return {}
+	var next = _build_text_node(node.text)
 	if node.has('choices'):
 		var choices = []
 		var id = 0
@@ -123,10 +151,9 @@ func _build_node(node) -> Dictionary:
 			choice_path.push_back(id - 1)
 			if choice.has('if') and not _if(choice['if'], choice_path):
 				continue
-			choices.append({
-				'text': _build_text(choice.text),
-				'id': id - 1,
-			})
+			var choice_line = _build_text_node(choice.text)
+			choice_line['id'] = id - 1
+			choices.append(choice_line)
 		if len(choices) > 0:
 			next['choices'] = choices
 			return next
@@ -134,10 +161,31 @@ func _build_node(node) -> Dictionary:
 			return {}
 	return next
 
-func _build_text(textes) -> String:
+func _build_text_node(textes) -> Dictionary:
 	var text = _do_build_text(textes)
-	# execute post process here (e.g. variable substitution)
-	return text
+	var node = {
+		'text': text.format(variables, '$_')
+	}
+	match node['text'].split(':', false, 1) as Array:
+		[var _text_part]:
+			node['text'] = _text_part
+		[var _who, var _text_part]:
+			node['who'] = _who.strip_edges()
+			node['text'] = _text_part
+
+	match node['text'].split('#', false, 1) as Array:
+		[var _text_part]:
+			node['text'] = _text_part
+		[var _text_part, var _tags]:
+			node['text'] = _text_part
+			node['tags'] = []
+			for tag in _tags.split('#', false):
+				tag = tag.strip_edges()
+				if tag.begins_with('!'):
+					emit_signal("event_emitted", parent_dialog, tag.right(1))
+				node['tags'].push_back(tag)
+
+	return node
 
 func _do_build_text(textes) -> String:
 	var s = ""
@@ -204,6 +252,8 @@ func _merge_dialogs(json: Dictionary) -> bool:
 
 func _op(opperation) -> void:
 	match opperation:
+		['=', var key, var value]:
+			variables[key] = value
 		['+', var key, var value]:
 			variables[key] += value
 		['-', var key, var value]:
@@ -213,23 +263,24 @@ func _op(opperation) -> void:
 
 func _if(predicate, path = []) -> bool:
 	match predicate:
-		['test', var variable, var op, var value]:
-			if not variables.has(variable):
+		['test', var key, var op, var value]:
+			if not variables.has(key):
 				return false
 			else:
+				var variable = variables[key]
 				match op:
 					'eq':
-						return variables[variable] == value
+						return variable == value
 					'ne':
-						return variables[variable] != value
+						return variable != value
 					'lt':
-						return variables[variable] < value
+						return variable < value
 					'le':
-						return variables[variable] <= value
+						return variable <= value
 					'gt':
-						return variables[variable] > value
+						return variable > value
 					'ge':
-						return variables[variable] >= value
+						return variable >= value
 			return false
 		['count_lower', var nth]:
 			return not visited.has(path) or visited[path] < nth

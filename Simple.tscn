@@ -177,3 +177,4 @@ script = ExtResource( 1 )
 dialog_files = [ "res://example.json" ]
 [connection signal="pressed" from="UI/Menu/Go" to="." method="_on_StartDialog_pressed"]
 [connection signal="pressed" from="UI/Dialog/Next" to="." method="_on_NextDialog_pressed"]
+[connection signal="event_emitted" from="DialogSystem" to="." method="_on_DialogSystem_Event_emitted"]

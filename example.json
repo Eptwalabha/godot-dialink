@@ -1,77 +1,93 @@
 {
     "variables": {
-        "variable_one": 1,
-        "variable_two": "super"
+        "bob_age": 20,
+        "variable_two": "super",
+        "character_two": "Alice",
+        "character_two_introduced": false
     },
     "dialogs": {
         "dialog_key_one": [
             {
                 "if": ["not_visited", "dialog_key_one.part_two"],
-                "text": ["Hello, how are you?"]
+                "text": ["$character_two: Hello, how are you? # fake # lol"]
             },
             {
-                "text": ["My name is John."]
+                "text": ["bob: My name is bob, and I'm ($bob_age) years old. # super"]
             },
             {
-                "op": ["+", "variable_one", 1]
+                "op": ["+", "bob_age", 1]
             },
             {
-                "text": ["do you know why you wake up here?"],
+                "text": ["bob: test: do you know why you wake up here? # tag1 #tag2 # !particle #!event"],
                 "choices": [
                     {
                         "text": [
-                            "no ",
+                            "No",
                             {
-                                "if": ["test", "variable_one", "gt", 2],
-                                "text": ["( $variable_one ) "]
+                                "if": ["test", "bob_age", "gt", 25],
+                                "text": [" old man ( of $bob_age years old)"]
                             },
-                            "and frankly… I don't care"
+                            ". And to be honest. I don't care."
                         ],
-                        "then": "part_two",
+                        "then": [
+                            {
+                                "text": ["bob: ok, I understand"]
+                            },
+                            {
+                                "if": ["test", "character_two_introduced", "eq", false],
+                                "then": "part_two"
+                            },
+                            {
+                                "text": ["$character_two: How rude!"]
+                            },
+                            {
+                                "then": "dialog_key_one"
+                            }
+                        ],
                         "f": 1
                     },
                     {
                         "if": ["test", "variable_two", "eq", "super"],
-                        "text": ["test String comparaison"],
+                        "text": ["To test string comparaison ?"],
                         "then": [
                             {
-                                "text": ["text A"]
+                                "text": ["bob: text A #!particle"]
                             },
                             {
                                 "if": ["test", "variable_two", "eq", "nope"],
-                                "text": ["this text should never show up"]
+                                "text": ["bob: this line of text will never show up"]
                             },
                             {
-                                "text": ["text C (back to start)"],
+                                "text": ["bob: text C (back to start) # !useless-event"],
                                 "then": "dialog_key_one"
                             }
                         ]
                     },
                     {
-                        "if": ["test", "variable_one", "gt", 3],
-                        "text": ["who are you again?"],
+                        "if": ["test", "bob_age", "gt", 22],
+                        "text": ["Who are you again?"],
                         "then": "dialog_key_one"
                     },
                     {
                         "if": ["visited", "ending"],
-                        "text": ["yes, I also know who you are dipshit"],
+                        "text": ["Yes, I've already been to the end of this dialog."],
                         "then": "dialog_key_two"
                     },
                     {
-                        "text": ["choice 4"],
+                        "text": ["I don't know, but… could I see the particle again ?"],
                         "then": [
                             {
-                                "text": ["super"]
+                                "text": ["bob: There you go #!particle"]
                             },
                             {
-                                "text": ["other question: are you ok?"],
+                                "text": ["bob: Other question: are you feeling all right?"],
                                 "choices": [
                                     {
-                                        "text": "1. yes",
+                                        "text": "Yes",
                                         "then": "yes"
                                     },
                                     {
-                                        "text": "2. no",
+                                        "text": "No",
                                         "then": "no"
                                     }
                                 ]
@@ -79,17 +95,26 @@
                         ]
                     },
                     {
-                        "text": ["quit"]
+                        "text": ["I want to quit"]
                     }
                 ]
             }
         ],
         "dialog_key_one.part_two": [
             {
-                "text": ["welome to part two"]
+                "text": ["bob: hey, who's that person?"]
             },
             {
-                "text": ["but we need to go back to part one"],
+                "text": ["Welome to part two, where '$character_two' is introduced"]
+            },
+            {
+                "op": ["=", "character_two_introduced", true]
+            },
+            {
+                "text": ["$character_two: Hello! my name is '$character_two'"]
+            },
+            {
+                "text": ["$character_two: It was nice to meet you, but we need to go back to part one"],
                 "then": "dialog_key_one"
             }
         ],
@@ -109,6 +134,9 @@
             }
         ],
         "ending": [
+            {
+                "text": ["this is the end of the world"]
+            }
         ]
     }
 }

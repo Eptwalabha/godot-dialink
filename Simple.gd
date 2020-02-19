@@ -24,7 +24,7 @@ func update_dialog(data) -> void:
 	dialog_box.visible = not end_of_dialog
 	if not end_of_dialog:
 		empty_choice_container()
-		dialog_title.text = 'who'
+		dialog_title.text = '' if not data.has('who') else data['who']
 		dialog_text.set_bbcode(data.text.c_unescape())
 		dialog_next.visible = not data.has('choices')
 		if data.has('choices'):
@@ -61,7 +61,7 @@ func _on_DialogChoice_pressed(choice_id: int) -> void:
 	var data = dialog_system.choice_next(choice_id)
 	update_dialog(data)
 
-func _on_GameGraph_event_triggered(dialog_name, event_name) -> void:
+func _on_DialogSystem_Event_emitted(dialog_name, event_name) -> void:
 	var error = events.append_bbcode("new event '[b][color=blue]%s[/color][/b]' from dialog [color=blue]%s[/color]\n" % [event_name, dialog_name])
 	if error:
 		print("%s %s %s" % [error, dialog_name, event_name])
