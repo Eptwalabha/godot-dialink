@@ -22,7 +22,7 @@
                         "text": [
                             "no ",
                             {
-                                "if": ["gt", "$variable_one", 2],
+                                "if": ["test", "variable_one", "gt", 2],
                                 "text": ["( $variable_one )"]
                             },
                             "and frankly… I don't care"

@@ -26,7 +26,7 @@ func update_dialog(data) -> void:
 		empty_choice_container()
 		dialog_title.text = 'who'
 		dialog_text.set_bbcode(data.text.c_unescape())
-		dialog_next.visible = true
+		dialog_next.visible = not data.has('choices')
 		if data.has('choices'):
 			for choice in data.choices:
 				add_dialog_choice(choice.text, choice.id)

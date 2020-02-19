@@ -55,7 +55,6 @@ func choice_next(index: int) -> Dictionary:
 		jump_to(then)
 	else:
 		current_path.push_back(0)
-	print(visited)
 	return next()
 
 func _move_forward() -> void:
@@ -114,7 +113,7 @@ func _build_node(node) -> Dictionary:
 	var next = {}
 	if not node.has('text'):
 		return next
-	next.text = node.text[0]
+	next.text = _build_text(node.text)
 	if node.has('choices'):
 		var choices = []
 		var id = 0
@@ -125,7 +124,7 @@ func _build_node(node) -> Dictionary:
 			if choice.has('if') and not _if(choice['if'], choice_path):
 				continue
 			choices.append({
-				'text': choice.text[0],
+				'text': _build_text(choice.text),
 				'id': id - 1,
 			})
 		if len(choices) > 0:
@@ -134,6 +133,20 @@ func _build_node(node) -> Dictionary:
 		else:
 			return {}
 	return next
+
+func _build_text(textes) -> String:
+	var text = _do_build_text(textes)
+	# execute post process here (e.g. variable substitution)
+	return text
+
+func _do_build_text(textes) -> String:
+	var s = ""
+	for part in textes:
+		if part is String:
+			s += part
+		elif part.has('if') and _if(part['if']):
+			s += _do_build_text(part.text)
+	return s
 
 func dialog_list() -> Array:
 	return dialogs.keys()
