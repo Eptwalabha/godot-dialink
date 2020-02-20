@@ -10,7 +10,6 @@ var variables := {}
 var dialogs := {}
 var visited := {}
 
-var current_dialog : String = ''
 var parent_dialog : String = ''
 var current_path : Array = []
 var last_node
@@ -19,9 +18,8 @@ func start(key: String) -> void:
 	if not dialogs.has(key):
 		return
 	_visit(key)
-	current_dialog = key
 	parent_dialog = key
-	current_path = [0]
+	current_path = [key, 0]
 
 func next() -> Dictionary:
 	var node = _current_node()
@@ -44,10 +42,10 @@ func choice_next(index: int) -> Dictionary:
 	if index >= node['choices'].size():
 		_clear_cursor()
 		return {}
-	current_path.push_back(index)
-	var choice_path = current_path.duplicate()
 
-	_visit(choice_path)
+	_visit(current_path.duplicate())
+	current_path.push_back(index)
+	_visit(current_path.duplicate())
 
 	node = _current_node()
 	if not node.has('then'):
@@ -96,10 +94,14 @@ func _move_next_sibling() -> void:
 	current_path.push_back(first + 1)
 
 func _current_node() -> Dictionary:
-	if current_dialog == '' or !dialogs.has(current_dialog) or !current_path.size():
+	if current_path.size() < 2:
 		return {}
-	var current = dialogs[current_dialog]
+	if !dialogs.has(current_path[0]):
+		return {}
+	var current = dialogs[current_path[0]]
 	for index in current_path:
+		if index is String:
+			continue
 		var element = []
 		if current is Array:
 			element = current
@@ -119,13 +121,11 @@ func _jump_to(sub_dialog_name) -> void:
 		var inner_jump = "%s.%s" % [parent_dialog, sub_dialog_name]
 		if dialogs.has(inner_jump):
 			_visit(inner_jump)
-			current_dialog = inner_jump
-			current_path = [0]
+			current_path = [inner_jump, 0]
 		elif dialogs.has(sub_dialog_name):
 			_visit(sub_dialog_name)
 			parent_dialog = sub_dialog_name
-			current_dialog = sub_dialog_name
-			current_path = [0]
+			current_path = [sub_dialog_name, 0]
 		else:
 			_clear_cursor()
 			printerr("wtf is '%s'?" % sub_dialog_name)
@@ -137,7 +137,6 @@ func _visit(key) -> void:
 
 func _clear_cursor() -> void:
 	parent_dialog = ''
-	current_dialog = ''
 	current_path = []
 
 func _build_node(node) -> Dictionary:

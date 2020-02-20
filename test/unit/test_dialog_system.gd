@@ -8,7 +8,7 @@ func setup():
 
 func test_error():
 	dialog.start('non_existing_dialog')
-	assert_eq('', dialog.current_dialog)
+	assert_eq([], dialog.current_path)
 	assert_eq([], dialog.dialog_list())
 
 func test_dialog_list():
@@ -24,7 +24,7 @@ func test_dialog_list():
 
 	for dialog_key in dialog_list:
 		dialog.start(dialog_key)
-		assert_eq(dialog_key, dialog.current_dialog)
+		assert_eq([dialog_key, 0], dialog.current_path)
 
 func test_dialog_next_with_text_only():
 	var dialog_list = {
@@ -217,3 +217,69 @@ func test_conditional():
 	dialog.set_var("bar", "cba")
 	assert_false(dialog._if(["test", "bar", "eq", "abc"]))
 	assert_true(dialog._if(["test", "bar", "ne", "abc"]))
+
+func test_visit_dialogs():
+	var dialog_list = {
+		"A": [],
+		"B": [],
+		"C": [],
+	}
+	dialog.setup_dialog(dialog_list)
+	dialog.start("A")
+	assert_eq(1, dialog.visited['A'])
+	assert_false(dialog.visited.has('B'))
+	assert_false(dialog.visited.has('C'))
+
+	dialog.start("A")
+	dialog.start("B")
+	dialog.start("A")
+	assert_eq(3, dialog.visited['A'])
+	assert_eq(1, dialog.visited['B'])
+	assert_false(dialog.visited.has('C'))
+
+func test_visit_choices():
+	var dialog_list = {
+		"test": [
+			{
+				"text": "abc",
+				"choices": [
+					{ "text": "choice 1" },
+					{ "text": "choice 2" },
+					{ "text": "choice 3" },
+					{
+						"text": "choice 4",
+						"then": [
+							{
+								"text": "abc",
+								"choices": [
+									{ "text": "choice 4-1" },
+									{ "text": "choice 4-2" },
+								]
+							}
+						]
+					}
+				]
+			}
+		],
+	}
+	dialog.setup_dialog(dialog_list)
+	for choice_index in [0, 0, 1, 0, 2, 2, 0]:
+		dialog.start("test")
+		dialog.next()
+		dialog.choice_next(choice_index)
+
+	assert_eq(7, dialog.visited['test'])
+	assert_eq(4, dialog.visited[['test', 0, 0]])
+	assert_eq(1, dialog.visited[['test', 0, 1]])
+	assert_eq(2, dialog.visited[['test', 0, 2]])
+
+	for choice_index in [0, 1, 0, 0, 1, 1, 1, 1]:
+		dialog.start("test")
+		dialog.next()
+		dialog.choice_next(3)
+		dialog.choice_next(choice_index)
+
+	assert_eq(15, dialog.visited['test'])
+	assert_eq(8, dialog.visited[['test', 0, 3, 0]])
+	assert_eq(3, dialog.visited[['test', 0, 3, 0, 0]])
+	assert_eq(5, dialog.visited[['test', 0, 3, 0, 1]])
