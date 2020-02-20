@@ -32,7 +32,7 @@ config/icon="res://icon.png"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "dialink" )
+enabled=PoolStringArray( "dialink", "gut" )
 
 [rendering]
 
