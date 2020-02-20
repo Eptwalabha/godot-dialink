@@ -4,9 +4,8 @@ extends Node
 
 signal event_emitted(dialog, event_name)
 
-export(Array, String, FILE) var dialog_files := [] setget _load_new_dialog_file
+export(String, FILE) var dialog_file setget _load_new_dialog_file
 
-var file_valid = false
 var variables := {}
 var dialogs := {}
 var visited := {}
@@ -210,40 +209,39 @@ func bind_function(function_name: String, node, function) -> void:
 	pass
 
 func _get_configuration_warning() -> String:
-	if not file_valid:
-		return "This node requires the JSON dialog's file in order to work."
+	if len(dialogs.keys()) == 0:
+		return "This node requires a valid JSON dialog's file in order to work."
 	return ""
 
-func _load_new_dialog_file(files: Array) -> void:
-	dialog_files = files
-	file_valid = true
+func _load_new_dialog_file(file_path: String) -> void:
 	_reset_node()
-	for f in files:
-		var file = File.new()
-		var error = file.open(f, file.READ)
-		if error:
-			file_valid = false
-			return
-		var json = JSON.parse(file.get_as_text()).result
-		if json.has("dialogs"):
-			_merge_dialogs(json)
+	var file = File.new()
+	var error = file.open(file_path, file.READ)
+	if error:
+		return
+	var json = JSON.parse(file.get_as_text())
+	if json.error or not json.result.has("dialogs"):
+		return
+	json = json.result
+	if setup_dialog(json['dialogs'], json.get('variables', {})):
+		dialog_file = file_path
 
 func _reset_node() -> void:
 	variables = {}
 	dialogs = {}
 	visited = {}
 
-func _merge_dialogs(json: Dictionary) -> bool:
-	var json_dialogs = json.get("dialogs")
-	var json_variables = json.get("variables")
-	for dialog_key in json_dialogs:
+func setup_dialog(_dialogs: Dictionary, _variables := {}) -> bool:
+	_reset_node()
+	for dialog_key in _dialogs:
 		if dialogs.has(dialog_key):
+			_reset_node()
 			printerr("dialog key '%s' already exists" % dialog_key)
 			return false
-		dialogs[dialog_key] = json_dialogs[dialog_key]
-	for variable in json_variables:
-		if not variables.has(variable):
-			variables[variable] = json_variables[variable]
+		dialogs[dialog_key] = _dialogs[dialog_key]
+	for variable_key in _variables:
+		if not variables.has(variable_key):
+			variables[variable_key] = _variables[variable_key]
 	return true
 
 func _op(opperation) -> void:
