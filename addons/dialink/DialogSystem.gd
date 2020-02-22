@@ -266,6 +266,9 @@ func _op(opperation) -> void:
 			if not variables.has(key):
 				variables[key] = 0
 			variables[key] *= value
+		['/', var key, var value]:
+			if variables.has(key):
+				variables[key] /= value
 
 func _if(predicate, path = []) -> bool:
 	match predicate:
