@@ -185,39 +185,6 @@ func test_dialog_with_conditional_choices() -> void:
 	node = dialog.choice_next(3)
 	assert_eq(node.hash(), {}.hash())
 
-func test_conditional() -> void:
-	dialog.set_var("foo", 3)
-	assert_false(dialog._if(["test", "foo", "eq", 5]))
-	assert_true(dialog._if(["test", "foo", "eq", 3]))
-	assert_false(dialog._if(["test", "foo", "eq", 1]))
-
-	assert_true(dialog._if(["test", "foo", "ne", 5]))
-	assert_false(dialog._if(["test", "foo", "ne", 3]))
-	assert_true(dialog._if(["test", "foo", "ne", 1]))
-
-	assert_true(dialog._if(["test", "foo", "lt", 5]))
-	assert_false(dialog._if(["test", "foo", "lt", 3]))
-	assert_false(dialog._if(["test", "foo", "lt", 1]))
-
-	assert_true(dialog._if(["test", "foo", "le", 5]))
-	assert_true(dialog._if(["test", "foo", "le", 3]))
-	assert_false(dialog._if(["test", "foo", "le", 1]))
-
-	assert_false(dialog._if(["test", "foo", "gt", 5]))
-	assert_false(dialog._if(["test", "foo", "gt", 3]))
-	assert_true(dialog._if(["test", "foo", "gt", 1]))
-
-	assert_false(dialog._if(["test", "foo", "ge", 5]))
-	assert_true(dialog._if(["test", "foo", "ge", 3]))
-	assert_true(dialog._if(["test", "foo", "ge", 1]))
-
-	assert_false(dialog._if(["test", "bar", "eq", "abc"]))
-	dialog.set_var("bar", "abc")
-	assert_true(dialog._if(["test", "bar", "eq", "abc"]))
-	dialog.set_var("bar", "cba")
-	assert_false(dialog._if(["test", "bar", "eq", "abc"]))
-	assert_true(dialog._if(["test", "bar", "ne", "abc"]))
-
 func test_visit_dialogs() -> void:
 	var dialog_list = {
 		"A": [],
