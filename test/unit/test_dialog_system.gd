@@ -1,17 +1,17 @@
 extends "res://addons/gut/test.gd"
 
 var DialogSystem = preload("res://addons/dialink/DialogSystem.gd")
-var dialog
+var dialog : DialogSystem
 
-func setup():
+func setup() -> void:
 	dialog = DialogSystem.new()
 
-func test_error():
+func test_error() -> void:
 	dialog.start('non_existing_dialog')
-	assert_eq([], dialog.current_path)
-	assert_eq([], dialog.dialog_list())
+	assert_eq(dialog.current_path, [])
+	assert_eq(dialog.dialog_list(), [])
 
-func test_dialog_list():
+func test_dialog_list() -> void:
 	var dialog_list = {
 		"dialog-one": [],
 		"dialog-two": [],
@@ -20,13 +20,13 @@ func test_dialog_list():
 	assert_true(dialog.setup_dialog(dialog_list))
 
 	var expected_list1 = ['dialog-one', 'dialog-two', 'dialog-three']
-	assert_eq(expected_list1, dialog.dialog_list())
+	assert_eq(dialog.dialog_list(), expected_list1)
 
 	for dialog_key in dialog_list:
 		dialog.start(dialog_key)
-		assert_eq([dialog_key, 0], dialog.current_path)
+		assert_eq(dialog.current_path, [dialog_key, 0])
 
-func test_dialog_next_with_text_only():
+func test_dialog_next_with_text_only() -> void:
 	var dialog_list = {
 		"dialog-a": [
 			{ "text": "text 1" },
@@ -50,21 +50,21 @@ func test_dialog_next_with_text_only():
 	assert_true(dialog.setup_dialog(dialog_list))
 	dialog.start('dialog-a')
 
-	assert_eq("text 1", dialog.next().text)
-	assert_eq("text 2", dialog.next().text)
-	assert_eq("text 3 text 3.2", dialog.next().text)
+	assert_eq(dialog.next().text, "text 1")
+	assert_eq(dialog.next().text, "text 2")
+	assert_eq(dialog.next().text, "text 3 text 3.2")
 	var node = dialog.next()
-	assert_eq(" text 4 text 4.2 ", node.text)
-	assert_eq("doctor", node.who)
+	assert_eq(node.text, " text 4 text 4.2 ")
+	assert_eq(node.who, "doctor")
 
-	assert_eq("text 5 text 7", dialog.next().text)
-	assert_eq("x = $x", dialog.next().text)
+	assert_eq(dialog.next().text, "text 5 text 7")
+	assert_eq(dialog.next().text, "x = $x")
 	dialog.set_var("x", "abc")
 
-	assert_eq("x = abc", dialog.next().text)
-	assert_eq({}.hash(), dialog.next().hash())
+	assert_eq(dialog.next().text, "x = abc")
+	assert_eq(dialog.next().hash(), {}.hash())
 
-func test_dialog_with_choices():
+func test_dialog_with_choices() -> void:
 	var dialog_list = {
 		"choice-a": [
 			{
@@ -92,31 +92,31 @@ func test_dialog_with_choices():
 	dialog.start('choice-a')
 
 	var node = dialog.next()
-	assert_eq("this is a choice", node.text)
-	assert_eq(3, node.choices.size())
-	assert_eq("choice a", node.choices[0].text)
-	assert_eq(0, node.choices[0].id)
-	assert_eq("choice b", node.choices[1].text)
-	assert_eq(1, node.choices[1].id)
-	assert_eq("choice c", node.choices[2].text)
-	assert_eq(2, node.choices[2].id)
+	assert_eq(node.text, "this is a choice")
+	assert_eq(node.choices.size(), 3)
+	assert_eq(node.choices[0].text, "choice a")
+	assert_eq(node.choices[0].id, 0)
+	assert_eq(node.choices[1].text, "choice b")
+	assert_eq(node.choices[1].id, 1)
+	assert_eq(node.choices[2].text, "choice c")
+	assert_eq(node.choices[2].id, 2)
 
-	assert_eq(node.hash(), dialog.next().hash())
+	assert_eq(dialog.next().hash(), node.hash())
 
 	var next = dialog.choice_next(0)
-	assert_eq({}.hash(), next.hash())
+	assert_eq(next.hash(), {}.hash())
 
 	dialog.start('choice-a')
 	dialog.next()
 	next = dialog.choice_next(1)
-	assert_eq("sub-choice b", next.text)
+	assert_eq(next.text, "sub-choice b")
 
 	dialog.start('choice-a')
 	dialog.next()
 	next = dialog.choice_next(2)
-	assert_eq("the end", next.text)
+	assert_eq(next.text, "the end")
 
-func test_dialog_with_conditional_choices():
+func test_dialog_with_conditional_choices() -> void:
 	var dialog_list = {
 		"A": [
 			{
@@ -152,40 +152,40 @@ func test_dialog_with_conditional_choices():
 	dialog.setup_dialog(dialog_list)
 	dialog.start('A')
 	var node = dialog.next()
-	assert_eq(" choice list A ", node.text)
-	assert_eq(["super", "test"], node.tags)
-	assert_eq(2, node.choices.size())
-	assert_eq("visit B", node.choices[0].text)
-	assert_eq(0, node.choices[0].id)
-	assert_eq("quit", node.choices[1].text)
-	assert_eq(3, node.choices[1].id)
+	assert_eq(node.text, " choice list A ")
+	assert_eq(node.tags, ["super", "test"])
+	assert_eq(node.choices.size(), 2)
+	assert_eq(node.choices[0].text, "visit B")
+	assert_eq(node.choices[0].id, 0)
+	assert_eq(node.choices[1].text, "quit")
+	assert_eq(node.choices[1].id, 3)
 
 	node = dialog.choice_next(0)
-	assert_eq("in dialog B", node.text)
+	assert_eq(node.text, "in dialog B")
 
 	node = dialog.next()
-	assert_eq(" choice list A ", node.text)
-	assert_eq(2, node.choices.size())
-	assert_eq("visit B again", node.choices[0].text)
-	assert_eq(1, node.choices[0].id)
-	assert_eq("quit", node.choices[1].text)
-	assert_eq(3, node.choices[1].id)
+	assert_eq(node.text, " choice list A ")
+	assert_eq(node.choices.size(), 2)
+	assert_eq(node.choices[0].text, "visit B again")
+	assert_eq(node.choices[0].id, 1)
+	assert_eq(node.choices[1].text, "quit")
+	assert_eq(node.choices[1].id, 3)
 
 	dialog.set_var("foo", 2)
 	node = dialog.next()
-	assert_eq(" choice list A ", node.text)
-	assert_eq(3, node.choices.size())
-	assert_eq("visit B again", node.choices[0].text)
-	assert_eq(1, node.choices[0].id)
-	assert_eq("foo is 2", node.choices[1].text)
-	assert_eq(2, node.choices[1].id)
-	assert_eq("quit", node.choices[2].text)
-	assert_eq(3, node.choices[2].id)
+	assert_eq(node.text, " choice list A ")
+	assert_eq(node.choices.size(), 3)
+	assert_eq(node.choices[0].text, "visit B again")
+	assert_eq(node.choices[0].id, 1)
+	assert_eq(node.choices[1].text, "foo is 2")
+	assert_eq(node.choices[1].id, 2)
+	assert_eq(node.choices[2].text, "quit")
+	assert_eq(node.choices[2].id, 3)
 
 	node = dialog.choice_next(3)
-	assert_eq({}.hash(), node.hash())
+	assert_eq(node.hash(), {}.hash())
 
-func test_conditional():
+func test_conditional() -> void:
 	dialog.set_var("foo", 3)
 	assert_false(dialog._if(["test", "foo", "eq", 5]))
 	assert_true(dialog._if(["test", "foo", "eq", 3]))
@@ -218,7 +218,7 @@ func test_conditional():
 	assert_false(dialog._if(["test", "bar", "eq", "abc"]))
 	assert_true(dialog._if(["test", "bar", "ne", "abc"]))
 
-func test_visit_dialogs():
+func test_visit_dialogs() -> void:
 	var dialog_list = {
 		"A": [],
 		"B": [],
@@ -226,18 +226,18 @@ func test_visit_dialogs():
 	}
 	dialog.setup_dialog(dialog_list)
 	dialog.start("A")
-	assert_eq(1, dialog.visited['A'])
+	assert_eq(dialog.visited['A'], 1)
 	assert_false(dialog.visited.has('B'))
 	assert_false(dialog.visited.has('C'))
 
 	dialog.start("A")
 	dialog.start("B")
 	dialog.start("A")
-	assert_eq(3, dialog.visited['A'])
-	assert_eq(1, dialog.visited['B'])
+	assert_eq(dialog.visited['A'], 3)
+	assert_eq(dialog.visited['B'], 1)
 	assert_false(dialog.visited.has('C'))
 
-func test_visit_choices():
+func test_visit_choices() -> void:
 	var dialog_list = {
 		"test": [
 			{
@@ -268,10 +268,10 @@ func test_visit_choices():
 		dialog.next()
 		dialog.choice_next(choice_index)
 
-	assert_eq(7, dialog.visited['test'])
-	assert_eq(4, dialog.visited[['test', 0, 0]])
-	assert_eq(1, dialog.visited[['test', 0, 1]])
-	assert_eq(2, dialog.visited[['test', 0, 2]])
+	assert_eq(dialog.visited['test'], 7)
+	assert_eq(dialog.visited[['test', 0, 0]], 4)
+	assert_eq(dialog.visited[['test', 0, 1]], 1)
+	assert_eq(dialog.visited[['test', 0, 2]], 2)
 
 	for choice_index in [0, 1, 0, 0, 1, 1, 1, 1]:
 		dialog.start("test")
@@ -279,7 +279,7 @@ func test_visit_choices():
 		dialog.choice_next(3)
 		dialog.choice_next(choice_index)
 
-	assert_eq(15, dialog.visited['test'])
-	assert_eq(8, dialog.visited[['test', 0, 3, 0]])
-	assert_eq(3, dialog.visited[['test', 0, 3, 0, 0]])
-	assert_eq(5, dialog.visited[['test', 0, 3, 0, 1]])
+	assert_eq(dialog.visited['test'], 15)
+	assert_eq(dialog.visited[['test', 0, 3, 0]], 8)
+	assert_eq(dialog.visited[['test', 0, 3, 0, 0]], 3)
+	assert_eq(dialog.visited[['test', 0, 3, 0, 1]], 5)

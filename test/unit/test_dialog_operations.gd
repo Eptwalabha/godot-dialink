@@ -1,12 +1,12 @@
 extends "res://addons/gut/test.gd"
 
 var DialogSystem = preload("res://addons/dialink/DialogSystem.gd")
-var dialog
+var dialog : DialogSystem
 
-func setup():
+func setup() -> void:
 	dialog = DialogSystem.new()
 
-func test_operations():
+func test_operations() -> void:
 	var dialog_list = {
 		"A": [
 			{ "op": ["+", "foo", 2] },
@@ -45,3 +45,39 @@ func test_operations():
 	dialog.next()
 	assert_eq(dialog.variables['foo'], "text")
 	assert_eq(dialog.variables['bar'], 0.111)
+
+func test_operation_with_text() -> void:
+	var dialog_list = {
+		'A': [
+			{
+				"op": ["+", "foo", 7],
+				"text": "some text"
+			}
+		]
+	}
+	dialog.setup_dialog(dialog_list, { 'foo': 10 })
+	dialog.start('A')
+	var next = dialog.next()
+	print(next)
+	assert_eq(next.text, "some text")
+	assert_eq(dialog.variables['foo'], 17)
+
+func test_operation_with_then() -> void:
+	var dialog_list = {
+		'A': [
+			{
+				"op": ["+", "foo", 3],
+				"then": "B",
+			}
+		],
+		'B': [
+			{
+				"op": ["+", "foo", 2],
+				"text": "in dialog B"
+			}
+		]
+	}
+	dialog.setup_dialog(dialog_list, { 'foo': 10 })
+	dialog.start('A')
+	var next = dialog.next()
+	assert_eq(next.text, "in dialog B")
