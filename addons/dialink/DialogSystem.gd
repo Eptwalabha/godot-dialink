@@ -189,6 +189,7 @@ func _build_text_node(textes) -> Dictionary:
 					emit_signal("event_emitted", parent_dialog, tag.right(1))
 				node['tags'].push_back(tag)
 
+	node.text = node.text.strip_edges()
 	return node
 
 func _do_build_text(textes) -> String:

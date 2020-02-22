@@ -26,44 +26,6 @@ func test_dialog_list() -> void:
 		dialog.start(dialog_key)
 		assert_eq(dialog.current_path, [dialog_key, 0])
 
-func test_dialog_next_with_text_only() -> void:
-	var dialog_list = {
-		"dialog-a": [
-			{ "text": "text 1" },
-			{ "text": "text 2" },
-			{ "text": ["text 3", " text 3.2"] },
-			{ "text": [" doctor : text 4", " text 4.2 "]},
-			{ "text": [
-				"text 5",
-				{
-					"if": ["visited", "dialog-b"],
-					"text": ["text 6"],
-				},
-				" text 7",
-				]
-			},
-			{ "text": "x = $x" },
-			{ "text": "x = $x" },
-		],
-	}
-
-	assert_true(dialog.setup_dialog(dialog_list))
-	dialog.start('dialog-a')
-
-	assert_eq(dialog.next().text, "text 1")
-	assert_eq(dialog.next().text, "text 2")
-	assert_eq(dialog.next().text, "text 3 text 3.2")
-	var node = dialog.next()
-	assert_eq(node.text, " text 4 text 4.2 ")
-	assert_eq(node.who, "doctor")
-
-	assert_eq(dialog.next().text, "text 5 text 7")
-	assert_eq(dialog.next().text, "x = $x")
-	dialog.set_var("x", "abc")
-
-	assert_eq(dialog.next().text, "x = abc")
-	assert_eq(dialog.next().hash(), {}.hash())
-
 func test_dialog_with_choices() -> void:
 	var dialog_list = {
 		"choice-a": [
@@ -152,7 +114,7 @@ func test_dialog_with_conditional_choices() -> void:
 	dialog.setup_dialog(dialog_list)
 	dialog.start('A')
 	var node = dialog.next()
-	assert_eq(node.text, " choice list A ")
+	assert_eq(node.text, "choice list A")
 	assert_eq(node.tags, ["super", "test"])
 	assert_eq(node.choices.size(), 2)
 	assert_eq(node.choices[0].text, "visit B")
@@ -164,7 +126,7 @@ func test_dialog_with_conditional_choices() -> void:
 	assert_eq(node.text, "in dialog B")
 
 	node = dialog.next()
-	assert_eq(node.text, " choice list A ")
+	assert_eq(node.text, "choice list A")
 	assert_eq(node.choices.size(), 2)
 	assert_eq(node.choices[0].text, "visit B again")
 	assert_eq(node.choices[0].id, 1)
@@ -173,7 +135,7 @@ func test_dialog_with_conditional_choices() -> void:
 
 	dialog.set_var("foo", 2)
 	node = dialog.next()
-	assert_eq(node.text, " choice list A ")
+	assert_eq(node.text, "choice list A")
 	assert_eq(node.choices.size(), 3)
 	assert_eq(node.choices[0].text, "visit B again")
 	assert_eq(node.choices[0].id, 1)
