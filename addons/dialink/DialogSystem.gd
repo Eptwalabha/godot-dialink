@@ -75,7 +75,7 @@ func _process_then(node) -> void:
 		if then is String:
 			_jump_to(then)
 		if then is Array:
-			current_path.push_back(0)
+			pass
 
 func _move_forward(node: Dictionary) -> void:
 	if node.has('then'):
@@ -94,12 +94,15 @@ func _move_next_sibling() -> void:
 	current_path.push_back(first + 1)
 
 func _current_node() -> Dictionary:
-	if current_path.size() < 2:
+	return _get_node_at(current_path)
+
+func _get_node_at(path: Array) -> Dictionary:
+	if path.size() < 2:
 		return {}
-	if !dialogs.has(current_path[0]):
+	if !dialogs.has(path[0]):
 		return {}
-	var current = dialogs[current_path[0]]
-	for index in current_path:
+	var current = dialogs[path[0]]
+	for index in path:
 		if index is String:
 			continue
 		var element = []
