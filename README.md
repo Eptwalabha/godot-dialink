@@ -29,7 +29,7 @@ Finaly, activate the plugin `Project`>`Project Settings`>`Plugins`.
 
 # How to
 Once the plugin is activated, you should see a new `DialogSystem` node in the node list with the following icon:
-[!dialink icon](https://raw.githubusercontent.com/Eptwalabha/godot-dialink/master/icon.png)
+![dialink icon](https://raw.githubusercontent.com/Eptwalabha/godot-dialink/master/icon.png)
 Add it to your Scene (If needed, you can add more).  
 In order to work, you need to provide to the new node with a JSON file where all your dialogs are defined.
 
