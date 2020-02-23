@@ -14,7 +14,6 @@ var dialogs := []
 
 func _ready() -> void:
 	select.clear()
-	var id = 0
 	for dialog in dialog_system.dialog_list():
 		select.add_item(dialog)
 	dialog_box.hide()
