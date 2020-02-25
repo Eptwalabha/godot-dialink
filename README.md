@@ -1,4 +1,4 @@
-# Dialink :)![dialink icon](https://raw.githubusercontent.com/Eptwalabha/godot-dialink/master/icon.png)  
+# Dialink :D![dialink icon](https://raw.githubusercontent.com/Eptwalabha/godot-dialink/master/icon.png)  
 A Godot 3.2 plugin to easily handle dialogs in your game.
 
 # What this plugin isn't
@@ -19,8 +19,14 @@ Then copy the `addons/dialink` directory into the `addons` directory of your pro
 Finaly, activate the plugin `Project`>`Project Settings`>`Plugins`.
 
 ## From the Godot asset library
-The plugin was submitted to the asset library but has not yet been approved.  
-I'll update this section once the plugin's available on the plateform.
+The plugin is available [here](https://godotengine.org/asset-library/asset/543).  
+1. Directly from the godot editor, open the `AssetLib` and search for `Dialink` under the `Tools` category.  
+2. Once the plugin's popup is opened, click `download` then `install`.
+3. The `Package Content` popup should open, uncheck everything but the `addons/dialink` directory and its content (if you skip this step, you might end up with unwanted scenes/tests).
+4. Click `ok`
+5. activate the plugin `Project`>`Project Settings`>`Plugins`.
+
+You can now access the new `DialogSystem` node.
 
 # Quick tutorial
 
