@@ -296,9 +296,19 @@ func _if(predicate, path = []) -> bool:
 						return variable >= value
 			return false
 		['count_lower', var nth]:
-			return not visited.has(path) or visited[path] < nth
+			return get_visit_count(path) < nth
+		['visited']:
+			return get_visit_count(path) > 0
 		['visited', var dialog_key]:
-			return visited.has(dialog_key) and visited[dialog_key] > 0
+			return get_visit_count(dialog_key) > 0
+		['not_visited']:
+			return get_visit_count(path) == 0
 		['not_visited', var dialog_key]:
-			return not visited.has(dialog_key) or visited[dialog_key] == 0
+			return get_visit_count(dialog_key) == 0
 	return false
+
+func get_visit_count(path) -> int:
+	if path is String or (path is Array and path.size() > 0):
+		if visited.has(path):
+			return visited[path]
+	return 0
