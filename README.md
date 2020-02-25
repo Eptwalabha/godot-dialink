@@ -2,13 +2,13 @@
 A Godot 3.2 plugin to easily handle dialogs in your game.
 
 # What this plugin isn't
-- This plugin **is not** a Nod2D nor a Control node that will display dialogs
+- This plugin **is not** a Node2D nor a Control node that will display dialogs
 - This plugin **is not** (yet) a dialog editor
 
 # Then what is it?
 This plugin is useful if your game needs to handle multiple dialogs with multiple choices and/or conditional branching (it also handles simple linear dialog as well ;) ).  
 Under the hood, the new `DialogSystem` node will take care of the logic of your dialogs.  
-Once everything's setup, you just have to ask the node what to display next.  
+Once everything's set up, you just have to ask the node what to display next.  
 # Install
 ## From github:
 Download / clone the project somewhere on your computer
@@ -29,8 +29,8 @@ Once the plugin is activated, you should see a new `DialogSystem` node in the no
 ![dialink icon](https://raw.githubusercontent.com/Eptwalabha/godot-dialink/master/icon.png)  
 Add it to your Scene (you can add more than one).  
 
-## Setup the new node
-In order to work, you need to provide to the new node with a JSON file. This file is where all your dialogs are defined.
+## Set up the new node
+In order to work, you need to provide the new node with a JSON file where all your dialogs are defined.
 For the sake of this tutorial, we'll use the following JSON file (`my-simple-dialog.json`):
 ``` json
 {
@@ -60,19 +60,19 @@ For the sake of this tutorial, we'll use the following JSON file (`my-simple-dia
     }
 }
 ```
-Seting up a new node is as simple as:
+Setting up a new node is as simple as:
 ``` gdscript
 var dialogs = $DialogSystem
-# setup the json file containing all your game dialogs
+# set up the json file containing all your game dialogs
 # (this can also be done directly from the editor's inspector)
 dialogs.dialog_file = 'res://my-simple-dialog.json'
 # let start the dialog named 'hello-world'
 dialogs.start("hello-world")
 ```
-That's it, you're all setup!
+That's it, you're all set up!
 
 ## Let's chat a bit  
-If you want to know what dialog to display next, you just have to call the `next()` function:
+If you want to know what dialog to display next, just call the `next()` function:
 ``` gdscript
 var dialog_content = dialogs.next()
 ```
@@ -82,7 +82,7 @@ This will return a `Dictionary` containing the current line of dialog to display
     'text': "Hello my friend."
 }
 ```
-Calling `next()` again will return the choices you need to display to your player:
+In this example, calling `next()` again will return the choices you need to display to your player:
 ``` gdscript
 {
     'text': "How are you?",
